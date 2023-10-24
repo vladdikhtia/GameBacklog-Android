@@ -14,14 +14,15 @@ class GameViewModel(application : Application) : AndroidViewModel(application) {
     private val gameRepository = GameRepository(application.applicationContext)
     private val mainScope = CoroutineScope(Dispatchers.Main)
 
-    val gameBacklog = gameRepository.getGames() // LiveData object exposes the games from the room database.
+    val gameBacklog =
+        gameRepository.getGames() // LiveData object exposes the games from the room database.
 
     /**
      * Insert a game into the repository.
      */
-    fun insertGame(game: Game){
+    fun insertGame(game : Game) {
         mainScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 gameRepository.insert(game)
             }
         }
@@ -30,9 +31,9 @@ class GameViewModel(application : Application) : AndroidViewModel(application) {
     /**
      * Delete a game from the repository.
      */
-    fun deleteGame(game : Game){
+    fun deleteGame(game : Game) {
         mainScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 gameRepository.delete(game)
             }
         }
@@ -41,9 +42,9 @@ class GameViewModel(application : Application) : AndroidViewModel(application) {
     /**
      * Delete the game backlog from the repository.
      */
-    fun deleteGameBacklog(){
+    fun deleteGameBacklog() {
         mainScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 gameRepository.deleteAll()
             }
         }

@@ -5,7 +5,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
-
 //Using the annotation @Entity we have defined that this is an entity
 // that needs to be stored in the database
 
