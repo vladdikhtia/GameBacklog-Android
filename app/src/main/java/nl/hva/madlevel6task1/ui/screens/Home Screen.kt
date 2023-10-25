@@ -2,6 +2,8 @@ package nl.hva.madlevel6task1.ui.screens
 
 import android.app.Application
 import android.content.Context
+import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,11 +17,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -39,7 +41,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,55 +59,56 @@ import nl.hva.madlevel6task1.viewModel.GameViewModel
 @Composable
 fun HomeScreen(navController : NavController, viewModel : GameViewModel) {
 
-    val context = LocalContext.current
     //The games variable holds the current list of games.
+    val context = LocalContext.current
     val games = viewModel.gameBacklog
     val snackbarHostState = remember { SnackbarHostState() } // Needed for the Snackbar object.
     val scope = rememberCoroutineScope() // Also needed for the Snackbar object.
-
     //And the deletedBackLog indicator is used when the delete all button is selected by the user.
     // It serves as a trigger for displaying the Snackbar message.
     // So it needs to be switched on and off in your code.
     var deletedBacklog by remember { mutableStateOf(false) } // Switch to decide whether Snackbar "undo delete all" option is used.
 
+
     Scaffold(
+
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        backgroundColor = Color.DarkGray,
         topBar = {
             TopAppBar(
-                {
+                title = {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = stringResource(id = R.string.app_name),
-                            color = Color.White
-                        )
-                        IconButton(
-                            onClick = {
-                                // Game backlog should be cleared from the database  only after confirmation i.e."UNDO" option NOT
-                                // selected on the "Snackbar". For that purpose we have introduced this switch.
-                                deletedBacklog = true
-                                scope.launch {
-                                    val result = snackbarHostState.showSnackbar(
-                                        message = context.getString(R.string.snackbar_msg),
-                                        actionLabel = context.getString(R.string.undo),
-                                        duration = SnackbarDuration.Long
-                                    )
-
-                                    if (result != SnackbarResult.ActionPerformed) {
-                                        viewModel.deleteGameBacklog()
-                                    }
-                                    deletedBacklog = false
+                        Text(text = stringResource(id = R.string.app_name), color = Color.White)
+                        IconButton(onClick = {
+                            // Game backlog should be cleared from the database  only after confirmation i.e."UNDO" option NOT
+                            // selected on the "Snackbar". For that purpose we have introduced this switch.
+                            deletedBacklog = true
+                            scope.launch {
+                                val result = snackbarHostState.showSnackbar(
+                                    message = context.getString(R.string.snackbar_msg),
+                                    actionLabel = context.getString(R.string.undo),
+                                    duration = SnackbarDuration.Long
+                                )
+                                if (result != SnackbarResult.ActionPerformed) {
+                                    // TODO: remove all games from the database!
+                                    viewModel.deleteGameBacklog()
                                 }
-
+                                deletedBacklog = false
                             }
-                        ) {
-                            Icon(Icons.Default.Delete, "Delete all games", tint = Color.White)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete all games",
+                                tint = Color.White
+                            )
                         }
                     }
                 },
-                //        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Blue)
+                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Blue)
             )
         },
         floatingActionButton = {
@@ -117,16 +119,15 @@ fun HomeScreen(navController : NavController, viewModel : GameViewModel) {
         content = { innerPadding ->
             Modifier.padding(innerPadding)
 
-//            if (!deletedBacklog){
-//                Games(
-//                    context = context,
-//                    games,
-//                    modifier = Modifier.padding(16.dp),
-//                    snackbarHostState
-//                )
-//            }
-        }
-    )
+            if (!deletedBacklog) {
+                Games(
+                    context = context,
+                    games,
+                    modifier = Modifier.padding(16.dp),
+                    snackbarHostState
+                )
+            }
+        })
 }
 
 @Composable
@@ -140,7 +141,7 @@ fun Games(
 
     LazyColumn(
         modifier = modifier
-            .padding(top = 80.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
+            .padding(top = 24.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         gamesState?.sortedBy { it.release }.let { games ->
@@ -174,7 +175,7 @@ fun GameCard(
             val result = snackbarHostState.showSnackbar(
                 message = context.getString(R.string.deleted_game, game.title),
                 actionLabel = context.getString(R.string.undo),
-                duration = SnackbarDuration.Long
+                duration = SnackbarDuration.Short
             )
             if (result != SnackbarResult.ActionPerformed) {
                 // TODO: remove the game from the database!!
@@ -204,7 +205,7 @@ fun GameCard(
                         modifier = Modifier.fillMaxWidth()
                     ){
                         Text(text = game.platform)
-                        Text(text = "Release" + Utils.dateToString(game.release))
+                        Text(text = "Release " + Utils.dateToString(game.release))
 
                     }
                 }
