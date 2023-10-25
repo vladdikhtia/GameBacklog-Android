@@ -18,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -73,6 +74,7 @@ fun AddGameScreen(navController : NavController, viewModel : GameViewModel) {
                 title = {
                     Text(
                         text = stringResource(id = R.string.add_game),
+                        style = MaterialTheme.typography.headlineSmall,
                         color = Color.White
                     )
                 },
@@ -212,7 +214,7 @@ fun verifyInputAndCorrect(
             Toast.makeText(context, R.string.empty_month, Toast.LENGTH_SHORT).show()
             return resultingGame
         } else {
-            if (month.length == 1) releaseMonth = "0" + month else releaseMonth = month
+            if (month.length == 1) releaseMonth = "0$month" else releaseMonth = month
             if (releaseMonth < "01" || releaseMonth > "12") {
                 Toast.makeText(context, R.string.wrong_month, Toast.LENGTH_SHORT).show()
                 return resultingGame

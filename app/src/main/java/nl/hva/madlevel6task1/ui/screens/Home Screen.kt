@@ -71,7 +71,6 @@ fun HomeScreen(navController : NavController, viewModel : GameViewModel) {
 
 
     Scaffold(
-
         snackbarHost = { SnackbarHost(snackbarHostState) },
         backgroundColor = Color.DarkGray,
         topBar = {
@@ -82,7 +81,7 @@ fun HomeScreen(navController : NavController, viewModel : GameViewModel) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = stringResource(id = R.string.app_name), color = Color.White)
+                        Text(text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.headlineSmall, color = Color.White)
                         IconButton(onClick = {
                             // Game backlog should be cleared from the database  only after confirmation i.e."UNDO" option NOT
                             // selected on the "Snackbar". For that purpose we have introduced this switch.
@@ -141,7 +140,7 @@ fun Games(
 
     LazyColumn(
         modifier = modifier
-            .padding(top = 24.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
+            .padding(top = 16.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         gamesState?.sortedBy { it.release }.let { games ->
@@ -205,7 +204,7 @@ fun GameCard(
                         modifier = Modifier.fillMaxWidth()
                     ){
                         Text(text = game.platform)
-                        Text(text = "Release " + Utils.dateToString(game.release))
+                        Text(text = "Release: " + Utils.dateToString(game.release))
 
                     }
                 }
